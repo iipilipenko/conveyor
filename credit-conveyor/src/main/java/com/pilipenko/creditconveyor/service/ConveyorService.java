@@ -8,21 +8,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.*;
+import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @PropertySource("classpath:creditConveyor.properties")
 public class ConveyorService {
 
     @Value("${base.rate}")
-    double baseRate;
+    Integer baseRate;
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long applicationId;
 
     BigDecimal minAmount = new BigDecimal(10000);
 
-    public ResponseEntity<List<LoanOfferDTO>> createLoanOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
+    public List<LoanOfferDTO> createLoanOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
         if (loanApplicationRequestDTO.getFirstName().length() < 2
                 || loanApplicationRequestDTO.getFirstName().length() > 30) {
@@ -54,9 +61,46 @@ public class ConveyorService {
             return null;
         }
         if (!loanApplicationRequestDTO.getPassportNumber().matches("[\\d]{6}")) {
-            return new ResponseEntity.status(HttpStatus.BAD_REQUEST.);
+            return null;
         }
 
+        ArrayList<LoanOfferDTO> loanOffers = new ArrayList<>();
+        loanOffers.add(getLoanOfferDTO(true, true, loanApplicationRequestDTO));
+        loanOffers.add(getLoanOfferDTO(false, false, loanApplicationRequestDTO));
+        loanOffers.add(getLoanOfferDTO(true, false, loanApplicationRequestDTO));
+        loanOffers.add(getLoanOfferDTO(false, true, loanApplicationRequestDTO));
+
+        return loanOffers;
+
+
     }
+
+    private LoanOfferDTO getLoanOfferDTO(boolean isInsuranceEnabled, boolean isSalaryClient, LoanApplicationRequestDTO loanApplicationRequestDTO) {
+        Integer rate = baseRate;
+        BigDecimal additionalServicesAmount = new BigDecimal(0);
+        BigDecimal totalAmount = loanApplicationRequestDTO.getAmount();
+
+        if (isSalaryClient) {
+            rate -= 1;
+        }
+
+        if (isInsuranceEnabled) {
+            rate -= 3;
+            additionalServicesAmount = totalAmount.multiply(new BigDecimal(0.01));
+        }
+
+        BigDecimal costOfUsingALoan = loanApplicationRequestDTO.getAmount().multiply(
+                new BigDecimal(rate * loanApplicationRequestDTO.getTerm()));
+
+        totalAmount = totalAmount.add(additionalServicesAmount);
+        totalAmount = totalAmount.add(costOfUsingALoan);
+        BigDecimal monthlyPayment = totalAmount.divide(new BigDecimal(loanApplicationRequestDTO.getTerm()));
+
+        return new LoanOfferDTO(applicationId, loanApplicationRequestDTO.getAmount(),
+                totalAmount, loanApplicationRequestDTO.getTerm(),
+                monthlyPayment, new BigDecimal(rate),
+                isInsuranceEnabled, isSalaryClient);
+    }
+
 
 }

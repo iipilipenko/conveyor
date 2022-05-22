@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class ConveyorController {
@@ -22,7 +23,11 @@ public class ConveyorController {
     @PostMapping(value = "/conveyor/offers", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
             MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LoanOfferDTO>> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) {
-        return conveyorService.createLoanOffers(loanApplicationRequestDTO);
+        final List<LoanOfferDTO> offerDTOList = conveyorService.createLoanOffers(loanApplicationRequestDTO);
+
+        return offerDTOList != null
+                ? new ResponseEntity<>(offerDTOList, HttpStatus.OK)
+                : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
 
