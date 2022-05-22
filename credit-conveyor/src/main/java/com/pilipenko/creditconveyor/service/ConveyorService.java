@@ -4,6 +4,8 @@ import com.pilipenko.creditconveyor.dto.LoanApplicationRequestDTO;
 import com.pilipenko.creditconveyor.dto.LoanOfferDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,7 +22,7 @@ public class ConveyorService {
 
     BigDecimal minAmount = new BigDecimal(10000);
 
-    public List<LoanOfferDTO> createLoanOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
+    public ResponseEntity<List<LoanOfferDTO>> createLoanOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
         if (loanApplicationRequestDTO.getFirstName().length() < 2
                 || loanApplicationRequestDTO.getFirstName().length() > 30) {
@@ -52,7 +54,7 @@ public class ConveyorService {
             return null;
         }
         if (!loanApplicationRequestDTO.getPassportNumber().matches("[\\d]{6}")) {
-            return null;
+            return new ResponseEntity.status(HttpStatus.BAD_REQUEST.);
         }
 
     }
