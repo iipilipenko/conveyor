@@ -2,6 +2,7 @@ package com.pilipenko.creditconveyor.dto;
 
 import com.pilipenko.creditconveyor.validation.Adult;
 import com.pilipenko.creditconveyor.validation.MiddleNameEpsonOrCorrect;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.Constraint;
@@ -9,8 +10,8 @@ import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@NotNull
 @Data
+@AllArgsConstructor
 public class LoanApplicationRequestDTO {
 
     @NotNull
