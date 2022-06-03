@@ -43,11 +43,8 @@ public class ConveyorController {
     @PostMapping(value = "/conveyor/offers", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
             MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LoanOfferDTO>> getLoanOffers(@RequestBody @Valid LoanApplicationRequestDTO loanApplicationRequestDTO) {
-        log.trace("A TRACE Message");
-        log.debug("A DEBUG Message");
-        log.info("An INFO Message");
-        log.warn("A WARN Message");
-        log.error("An ERROR Message");
+        log.info("New request /conveyor/offers from " + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName());
+
         final List<LoanOfferDTO> offerDTOList = conveyorService.createLoanOffers(loanApplicationRequestDTO);
 
         return offerDTOList != null
@@ -65,7 +62,7 @@ public class ConveyorController {
     @PostMapping(value = "/conveyor/calculation", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
             MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreditDTO> getCreditDTO(@RequestBody @Valid ScoringDataDTO scoringDataDTO) {
-        final CreditDTO creditDTO  = conveyorService.createCreditDTO(scoringDataDTO);
+        final CreditDTO creditDTO = conveyorService.createCreditDTO(scoringDataDTO);
 
         return creditDTO != null
                 ? new ResponseEntity<>(creditDTO, HttpStatus.OK)

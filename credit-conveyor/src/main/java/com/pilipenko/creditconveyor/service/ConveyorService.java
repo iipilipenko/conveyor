@@ -2,6 +2,7 @@ package com.pilipenko.creditconveyor.service;
 
 import com.pilipenko.creditconveyor.dto.*;
 import com.pilipenko.creditconveyor.enums.Gender;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-
+@Slf4j
 @Service
 @PropertySource("classpath:creditConveyor.properties")
 public class ConveyorService {
@@ -25,15 +26,25 @@ public class ConveyorService {
     @Value("${base.rate}")
     Double baseRate;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long applicationId;
-
     public List<LoanOfferDTO> createLoanOffers(@Valid LoanApplicationRequestDTO loanApplicationRequestDTO) {
         ArrayList<LoanOfferDTO> loanOffers = new ArrayList<>();
+        log.info("Creating loan offers for user: " + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName());
         loanOffers.add(getLoanOfferDTO(true, true, loanApplicationRequestDTO));
+        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 1 loan offer is created with : rate " + loanOffers.get(0).getRate().setScale(2, RoundingMode.HALF_UP) +
+                ", amount " + loanOffers.get(0).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(0).getTerm() + ", monthly payment " +
+                loanOffers.get(0).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
         loanOffers.add(getLoanOfferDTO(false, false, loanApplicationRequestDTO));
+        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 2 loan offer is created with : rate " + loanOffers.get(1).getRate().setScale(2, RoundingMode.HALF_UP) +
+                ", amount " + loanOffers.get(1).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(1).getTerm() + ", monthly payment " +
+                loanOffers.get(1).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
         loanOffers.add(getLoanOfferDTO(true, false, loanApplicationRequestDTO));
+        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 3 loan offer is created with : rate " + loanOffers.get(2).getRate().setScale(2, RoundingMode.HALF_UP) +
+                ", amount " + loanOffers.get(2).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(2).getTerm() + ", monthly payment " +
+                loanOffers.get(2).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
         loanOffers.add(getLoanOfferDTO(false, true, loanApplicationRequestDTO));
+        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 4 loan offer is created with : rate " + loanOffers.get(3).getRate().setScale(2, RoundingMode.HALF_UP) +
+                ", amount " + loanOffers.get(3).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(3).getTerm() + ", monthly payment " +
+                loanOffers.get(3).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
         Comparator<LoanOfferDTO> rateComparator = Comparator.comparing(LoanOfferDTO::getRate);
         loanOffers.sort(Collections.reverseOrder(rateComparator));
         return loanOffers;
@@ -42,26 +53,37 @@ public class ConveyorService {
     private LoanOfferDTO getLoanOfferDTO(boolean isInsuranceEnabled,
                                          boolean isSalaryClient, LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
+        log.info("Pre scoring loan offer insurance: " + isInsuranceEnabled + " salary client: " + isSalaryClient);
+
         Double rate = baseRate;
         BigDecimal additionalServicesAmount = new BigDecimal(0);
         BigDecimal totalAmount = loanApplicationRequestDTO.getAmount();
 
         if (isSalaryClient) {
             rate -= 1;
+            log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Rate decreased by 1 - salary client");
         }
 
         if (isInsuranceEnabled) {
             rate -= 3;
-            additionalServicesAmount = totalAmount.multiply(new BigDecimal(0.01));
+            log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Rate decreased by 3 - insurance enabled");
+            additionalServicesAmount = totalAmount.multiply(new BigDecimal(0.01)).setScale(2, RoundingMode.HALF_UP);
+            log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Insurance coast " + additionalServicesAmount);
+            totalAmount = totalAmount.add(additionalServicesAmount).setScale(2, RoundingMode.HALF_UP);
+
         }
 
-        totalAmount = totalAmount.add(additionalServicesAmount);
-
         BigDecimal costOfUsingALoan = totalAmount.multiply(
-                new BigDecimal(rate / 1200 * loanApplicationRequestDTO.getTerm()));
+                new BigDecimal(rate / 1200 * loanApplicationRequestDTO.getTerm())).setScale(2, RoundingMode.HALF_UP);
+        log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Cost of using loan " + costOfUsingALoan);
 
-        totalAmount = totalAmount.add(costOfUsingALoan);
-        BigDecimal monthlyPayment = totalAmount.divide(new BigDecimal(loanApplicationRequestDTO.getTerm()), 3, RoundingMode.HALF_UP);
+        totalAmount = totalAmount.add(costOfUsingALoan).setScale(2, RoundingMode.HALF_UP);
+        log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Total loan amount " + totalAmount);
+
+        BigDecimal monthlyPayment = totalAmount.divide(new BigDecimal(loanApplicationRequestDTO.getTerm()).setScale(2, RoundingMode.HALF_UP), 3, RoundingMode.HALF_UP);
+        log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Monthly payment " + monthlyPayment);
+
+        Long applicationId = 1l;
 
         return new LoanOfferDTO(applicationId, loanApplicationRequestDTO.getAmount(),
                 totalAmount, loanApplicationRequestDTO.getTerm(),
@@ -71,6 +93,8 @@ public class ConveyorService {
 
     public CreditDTO createCreditDTO(@Valid ScoringDataDTO scoringDataDTO) {
 
+        log.info("Scoring loan offer for user: " + scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName());
+
         Double rate = baseRate;
         BigDecimal value20Salaries = scoringDataDTO.getEmployment().getSalary().multiply(BigDecimal.valueOf(20));
         LocalDate birthDate = scoringDataDTO.getBirthdate();
@@ -79,16 +103,19 @@ public class ConveyorService {
         switch (scoringDataDTO.getEmployment().getEmploymentStatus()) {
             case WORKING:
                 baseRate += 0.5;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 0.5 - worker");
                 break;
             case ENTREPRENEUR:
                 baseRate += 3;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 3 - entrepreneur");
                 break;
             case SELF_EMPLOYED:
                 baseRate += 1;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 1 - self employed");
                 break;
             case JOBLESS:
             default:
-                System.out.println("im in work status");
+                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() );
                 return null;
 
         }
@@ -182,7 +209,7 @@ public class ConveyorService {
         for (int i = 0; i <= term; i++) {
             if (i != 0) {
                 tempPaymentSchedule.add(i, tempMonthlyPayment);
-                dateOfPayment.add(i, dateOfPayment.get(i-1).plusMonths(1));
+                dateOfPayment.add(i, dateOfPayment.get(i - 1).plusMonths(1));
             }
             if (i == 0) {
                 temDaysFromCreditToPayment = 0;
@@ -202,8 +229,8 @@ public class ConveyorService {
             x_m = x;
             x = BigDecimal.valueOf(0);
             for (int k = 0; k <= term; k++) {
-                BigDecimal tempX = x.add( tempPaymentSchedule.get(k).divide((BigDecimal.
-                        valueOf( ((1+listEk.get(k)*i)*Math.pow((1 + i), listQk.get(k))))),6, RoundingMode.FLOOR));
+                BigDecimal tempX = x.add(tempPaymentSchedule.get(k).divide((BigDecimal.
+                        valueOf(((1 + listEk.get(k) * i) * Math.pow((1 + i), listQk.get(k))))), 6, RoundingMode.FLOOR));
                 x = tempX;
             }
             System.out.println(x);
