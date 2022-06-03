@@ -115,40 +115,46 @@ public class ConveyorService {
                 break;
             case JOBLESS:
             default:
-                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() );
+                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - jobless ");
                 return null;
 
         }
         switch (scoringDataDTO.getEmployment().getPosition()) {
             case JUNIOR:
                 baseRate += 1;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 1 - junior");
                 break;
             case MIDDLE:
                 baseRate -= 1;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate decreased by 1 - middle");
                 break;
             case SENIOR:
                 baseRate -= 2;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate decreased by 2 - senior");
                 break;
             default:
-                System.out.println("im in work position");
+                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - incorrect work position");
                 return null;
         }
         if (scoringDataDTO.getAmount().compareTo(value20Salaries) > 0) {
-            System.out.println("im in salary");
+            log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - loan > 20 x salaries");
             return null;
         }
         switch (scoringDataDTO.getMaritalStatus()) {
             case MARRIED:
                 baseRate -= 3;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate decreased by 3 - married");
                 break;
             case SINGLE:
                 baseRate += 1;
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 1 - single");
                 break;
             case DIVORCE:
+                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 3 - divorce");
                 baseRate += 3;
                 break;
             default:
-                System.out.println("im in marital status");
+                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - incorrect marital status");
                 return null;
         }
         if (scoringDataDTO.getDependentAmount() > 1) {
