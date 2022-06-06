@@ -4,14 +4,18 @@ import com.pilipenko.creditconveyor.validation.Adult;
 import com.pilipenko.creditconveyor.validation.MiddleNameEpsonOrCorrect;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.Constraint;
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class LoanApplicationRequestDTO {
 
     @NotNull

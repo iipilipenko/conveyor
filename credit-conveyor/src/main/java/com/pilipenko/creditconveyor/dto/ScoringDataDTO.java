@@ -4,6 +4,7 @@ import com.pilipenko.creditconveyor.enums.Gender;
 import com.pilipenko.creditconveyor.enums.MartialStatus;
 import com.pilipenko.creditconveyor.validation.Adult;
 import com.pilipenko.creditconveyor.validation.MiddleNameEpsonOrCorrect;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.EnumType;
@@ -13,10 +14,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@AllArgsConstructor
 public class ScoringDataDTO {
 
     @NotNull
-    @DecimalMin(value = "10000", inclusive = true)
+    @DecimalMin(value = "10000", inclusive = true, message = "Amount should be greater or equal 10 000")
     private BigDecimal amount;
 
     @NotNull

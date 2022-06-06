@@ -1,15 +1,15 @@
 package com.pilipenko.creditconveyor.service;
 
 import com.pilipenko.creditconveyor.dto.*;
+import com.pilipenko.creditconveyor.enums.EmploymentStatus;
 import com.pilipenko.creditconveyor.enums.Gender;
+import com.pilipenko.creditconveyor.enums.JobPosition;
+import com.pilipenko.creditconveyor.enums.MartialStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -27,31 +27,35 @@ public class ConveyorService {
     Double baseRate;
 
     public List<LoanOfferDTO> createLoanOffers(@Valid LoanApplicationRequestDTO loanApplicationRequestDTO) {
+        Long applicationId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         ArrayList<LoanOfferDTO> loanOffers = new ArrayList<>();
-        log.info("Creating loan offers for user: " + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName());
-        loanOffers.add(getLoanOfferDTO(true, true, loanApplicationRequestDTO));
-        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 1 loan offer is created with : rate " + loanOffers.get(0).getRate().setScale(2, RoundingMode.HALF_UP) +
+        loanOffers.add(getLoanOfferDTO(true, true, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(getLoanOfferDTO(false, false, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(getLoanOfferDTO(true, false, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(getLoanOfferDTO(false, true, loanApplicationRequestDTO, applicationId));
+
+        log.info("Creating loan offers for user: " + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() +
+                "user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 1 loan offer is created with : rate " + loanOffers.get(0).getRate().setScale(2, RoundingMode.HALF_UP) +
                 ", amount " + loanOffers.get(0).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(0).getTerm() + ", monthly payment " +
-                loanOffers.get(0).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
-        loanOffers.add(getLoanOfferDTO(false, false, loanApplicationRequestDTO));
-        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 2 loan offer is created with : rate " + loanOffers.get(1).getRate().setScale(2, RoundingMode.HALF_UP) +
+                loanOffers.get(0).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP) + "\n" +
+                "user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 2 loan offer is created with : rate " + loanOffers.get(1).getRate().setScale(2, RoundingMode.HALF_UP) +
                 ", amount " + loanOffers.get(1).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(1).getTerm() + ", monthly payment " +
-                loanOffers.get(1).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
-        loanOffers.add(getLoanOfferDTO(true, false, loanApplicationRequestDTO));
-        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 3 loan offer is created with : rate " + loanOffers.get(2).getRate().setScale(2, RoundingMode.HALF_UP) +
+                loanOffers.get(1).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP) + "\n" +
+                "user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 3 loan offer is created with : rate " + loanOffers.get(2).getRate().setScale(2, RoundingMode.HALF_UP) +
                 ", amount " + loanOffers.get(2).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(2).getTerm() + ", monthly payment " +
-                loanOffers.get(2).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
-        loanOffers.add(getLoanOfferDTO(false, true, loanApplicationRequestDTO));
-        log.info("user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 4 loan offer is created with : rate " + loanOffers.get(3).getRate().setScale(2, RoundingMode.HALF_UP) +
+                loanOffers.get(2).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP) + "\n" +
+                "user :" + loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " 4 loan offer is created with : rate " + loanOffers.get(3).getRate().setScale(2, RoundingMode.HALF_UP) +
                 ", amount " + loanOffers.get(3).getTotalAmount().setScale(2, RoundingMode.HALF_UP) + ", term " + loanOffers.get(3).getTerm() + ", monthly payment " +
                 loanOffers.get(3).getMonthlyPayment().setScale(2, RoundingMode.HALF_UP));
+
         Comparator<LoanOfferDTO> rateComparator = Comparator.comparing(LoanOfferDTO::getRate);
         loanOffers.sort(Collections.reverseOrder(rateComparator));
         return loanOffers;
     }
 
     private LoanOfferDTO getLoanOfferDTO(boolean isInsuranceEnabled,
-                                         boolean isSalaryClient, LoanApplicationRequestDTO loanApplicationRequestDTO) {
+                                         boolean isSalaryClient, LoanApplicationRequestDTO loanApplicationRequestDTO,
+                                         Long applicationId) {
 
         log.info("Pre scoring loan offer insurance: " + isInsuranceEnabled + " salary client: " + isSalaryClient);
 
@@ -83,8 +87,6 @@ public class ConveyorService {
         BigDecimal monthlyPayment = totalAmount.divide(new BigDecimal(loanApplicationRequestDTO.getTerm()).setScale(2, RoundingMode.HALF_UP), 3, RoundingMode.HALF_UP);
         log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Monthly payment " + monthlyPayment);
 
-        Long applicationId = 1l;
-
         return new LoanOfferDTO(applicationId, loanApplicationRequestDTO.getAmount(),
                 totalAmount, loanApplicationRequestDTO.getTerm(),
                 monthlyPayment, new BigDecimal(rate),
@@ -95,122 +97,146 @@ public class ConveyorService {
 
         log.info("Scoring loan offer for user: " + scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName());
 
-        Double rate = baseRate;
-        BigDecimal value20Salaries = scoringDataDTO.getEmployment().getSalary().multiply(BigDecimal.valueOf(20));
-        LocalDate birthDate = scoringDataDTO.getBirthdate();
-        BigDecimal insurancePrice;
+        Double rate = calculateRate(scoringDataDTO.getEmployment().getEmploymentStatus(), scoringDataDTO.getEmployment().getPosition(),
+                scoringDataDTO.getEmployment().getSalary(), scoringDataDTO.getMaritalStatus(), scoringDataDTO.getDependentAmount(),
+                scoringDataDTO.getBirthdate(), scoringDataDTO.getGender(), scoringDataDTO.getEmployment().getWorkExperienceCurrent(),
+                scoringDataDTO.getEmployment().getWorkExperienceTotal(), scoringDataDTO.getIsInsuranceEnabled(),
+                scoringDataDTO.getIsSalaryClient(), scoringDataDTO.getAmount());
 
-        switch (scoringDataDTO.getEmployment().getEmploymentStatus()) {
-            case WORKING:
-                baseRate += 0.5;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 0.5 - worker");
-                break;
-            case ENTREPRENEUR:
-                baseRate += 3;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 3 - entrepreneur");
-                break;
-            case SELF_EMPLOYED:
-                baseRate += 1;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 1 - self employed");
-                break;
-            case JOBLESS:
-            default:
-                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - jobless ");
-                return null;
-
-        }
-        switch (scoringDataDTO.getEmployment().getPosition()) {
-            case JUNIOR:
-                baseRate += 1;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 1 - junior");
-                break;
-            case MIDDLE:
-                baseRate -= 1;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate decreased by 1 - middle");
-                break;
-            case SENIOR:
-                baseRate -= 2;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate decreased by 2 - senior");
-                break;
-            default:
-                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - incorrect work position");
-                return null;
-        }
-        if (scoringDataDTO.getAmount().compareTo(value20Salaries) > 0) {
-            log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - loan > 20 x salaries");
+        if (rate == null) {
             return null;
         }
-        switch (scoringDataDTO.getMaritalStatus()) {
-            case MARRIED:
-                baseRate -= 3;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate decreased by 3 - married");
-                break;
-            case SINGLE:
-                baseRate += 1;
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 1 - single");
-                break;
-            case DIVORCE:
-                log.info(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Rate increased by 3 - divorce");
-                baseRate += 3;
-                break;
-            default:
-                log.warn(scoringDataDTO.getFirstName() + " " + scoringDataDTO.getLastName() + " Denial of a loan - incorrect marital status");
-                return null;
-        }
-        if (scoringDataDTO.getDependentAmount() > 1) {
-            baseRate += 1;
-        }
-        if (Period.between(birthDate, LocalDate.now()).getYears() < 18 ||
-                Period.between(birthDate, LocalDate.now()).getYears() > 60) {
-            System.out.println("my age " + Period.between(birthDate, LocalDate.now()).getYears());
-            return null;
-        }
-        if (scoringDataDTO.getGender() == Gender.MALE
-                && Period.between(LocalDate.now(), birthDate).getYears() > 30
-                && Period.between(LocalDate.now(), birthDate).getYears() < 55) {
-            baseRate -= 3;
-        }
-        if (scoringDataDTO.getGender() == Gender.FEMALE
-                && Period.between(LocalDate.now(), birthDate).getYears() > 35
-                && Period.between(LocalDate.now(), birthDate).getYears() < 60) {
-            baseRate -= 3;
-        }
-        if (scoringDataDTO.getGender() == Gender.OTHER) {
-            baseRate += 3;
-        }
-        if (scoringDataDTO.getEmployment().getWorkExperienceCurrent() < 3
-                || scoringDataDTO.getEmployment().getWorkExperienceTotal() < 12) {
-            System.out.println("im in working exp");
-            return null;
-        }
-        if (scoringDataDTO.getIsInsuranceEnabled()) {
-            baseRate -= 3;
-        }
-        if (scoringDataDTO.getIsSalaryClient()) {
-            baseRate -= 1;
-        }
 
-        return calculateCreditParams(baseRate, scoringDataDTO.getAmount(), scoringDataDTO.getTerm(),
+        log.info("Calculating credit params");
+
+        return calculateCreditParams(rate, scoringDataDTO.getAmount(), scoringDataDTO.getTerm(),
                 scoringDataDTO.getIsInsuranceEnabled(), scoringDataDTO.getIsSalaryClient());
 
     }
 
-    private CreditDTO calculateCreditParams(double rate, BigDecimal amount,
-                                            int term, boolean isInsuranceEnabled, boolean isSalaryClient) {
+    public Double calculateRate(EmploymentStatus employmentStatus, JobPosition jobPosition, BigDecimal salary,
+                                MartialStatus martialStatus, int dependentAmount, LocalDate birthDate,
+                                Gender gender, int currentWorkingExperience, int totalWorkingExperience,
+                                boolean isInsuranceEnabled, boolean isSalaryClient, BigDecimal loanAmount) {
+
+        Double currentRate = baseRate;
+
+        switch (employmentStatus) {
+            case WORKING:
+                currentRate += 0.5;
+                log.info("Rate increased by 0.5 - worker");
+                break;
+            case ENTREPRENEUR:
+                currentRate += 3;
+                log.info("Rate increased by 3 - entrepreneur");
+                break;
+            case SELF_EMPLOYED:
+                currentRate += 1;
+                log.info("Rate increased by 1 - self employed");
+                break;
+            case JOBLESS:
+            default:
+                log.warn("Denial of a loan - jobless ");
+                return null;
+
+        }
+        switch (jobPosition) {
+            case JUNIOR:
+                currentRate += 1;
+                log.info("Rate increased by 1 - junior");
+                break;
+            case MIDDLE:
+                currentRate -= 1;
+                log.info("Rate decreased by 1 - middle");
+                break;
+            case SENIOR:
+                currentRate -= 2;
+                log.info("Rate decreased by 2 - senior");
+                break;
+            default:
+                log.warn("Denial of a loan - incorrect work position");
+                return null;
+        }
+        if (salary.multiply(BigDecimal.valueOf(20)).compareTo(loanAmount) < 0) {
+            log.warn("Denial of a loan - loan > 20 x salaries");
+            return null;
+        }
+        switch (martialStatus) {
+            case MARRIED:
+                currentRate -= 3;
+                log.info("Rate decreased by 3 - married");
+                break;
+            case SINGLE:
+                currentRate += 1;
+                log.info("Rate increased by 1 - single");
+                break;
+            case DIVORCE:
+                log.info("Rate increased by 3 - divorce");
+                currentRate += 3;
+                break;
+            default:
+                log.warn("Denial of a loan - incorrect marital status");
+                return null;
+        }
+        if (dependentAmount > 1) {
+            currentRate += 1;
+            log.info("Rate increased by 1 - dependent amount > 1");
+        }
+        if (Period.between(birthDate, LocalDate.now()).getYears() < 18 ||
+                Period.between(birthDate, LocalDate.now()).getYears() > 60) {
+            log.warn("Denial of a loan - <18 or >60 y.o.>");
+            return null;
+        }
+        if (gender == Gender.MALE
+                && (Period.between(birthDate, LocalDate.now()).getYears() > 30
+                || Period.between(birthDate, LocalDate.now()).getYears() < 55)) {
+            currentRate -= 3;
+            log.info("Rate decreased by 3 - male >30 <55 y.o");
+        }
+        if (gender == Gender.FEMALE
+                && (Period.between(birthDate, LocalDate.now()).getYears() > 35
+                || Period.between(birthDate, LocalDate.now()).getYears() < 60)) {
+            currentRate -= 3;
+            log.info("Rate decreased by 3 - female >35 <60 y.o");
+        }
+        if (gender == Gender.OTHER) {
+            log.info("Rate increased by 3 - just because non binary gender");
+            currentRate += 3;
+        }
+        if (currentWorkingExperience < 3
+                || totalWorkingExperience < 12) {
+            log.warn("Denial of a loan - working exp current <3y or working exp total <12");
+            return null;
+        }
+        if (isInsuranceEnabled) {
+            currentRate -= 3;
+            log.info("Rate decreased by 3 - insurance enabled");
+        }
+        if (isSalaryClient) {
+            log.info("Rate decreased by 1 - is salary client");
+            currentRate -= 1;
+        }
+        log.info("rate after scoring is " + currentRate);
+        return currentRate;
+    }
+
+    public CreditDTO calculateCreditParams(double rate, BigDecimal amount,
+                                           int term, boolean isInsuranceEnabled, boolean isSalaryClient) {
+
         List<BigDecimal> tempPaymentSchedule = new ArrayList<>();
-        List<Integer> daysFromGetCreditToKPayment = new ArrayList<>();
-        List<Double> listQk = new ArrayList<>();
+        List<Integer> listQk = new ArrayList<>();
         List<Double> listEk = new ArrayList<>();
         List<LocalDate> dateOfPayment = new ArrayList<>();
         List<PaymentScheduleElement> paymentSchedule = new ArrayList<>();
 
         double temDaysFromCreditToPayment;
-        final int CBP = 12;
 
         tempPaymentSchedule.add(0, amount.multiply(BigDecimal.valueOf(-1)));
         dateOfPayment.add(0, LocalDate.now());
         BigDecimal tempMonthlyPayment = amount.multiply(BigDecimal.valueOf((rate / (100 * 12))
                 / (1 - Math.pow((1 + (rate / (100 * 12))), -term))));
+        BigDecimal totalLoanCostWithInterestsPayments = tempMonthlyPayment.multiply(BigDecimal.valueOf(term));
+        log.info("totalLoanCostWithInterestsPayments ------------>" + totalLoanCostWithInterestsPayments);
 
         for (int i = 0; i <= term; i++) {
             if (i != 0) {
@@ -222,46 +248,56 @@ public class ConveyorService {
             } else {
                 temDaysFromCreditToPayment = ChronoUnit.DAYS.between(dateOfPayment.get(0), dateOfPayment.get(i));
             }
-            daysFromGetCreditToKPayment.add((int) temDaysFromCreditToPayment);
             listEk.add((temDaysFromCreditToPayment % 30) / 30);
-            listQk.add(Math.floor(temDaysFromCreditToPayment / 30));
+            listQk.add((int) Math.floor(temDaysFromCreditToPayment / 30));
         }
 
-        double i = 0;
+        BigDecimal i = BigDecimal.valueOf(0.011875);
         BigDecimal x = BigDecimal.valueOf(1.0);
         BigDecimal x_m = BigDecimal.valueOf(0.0);
-        double s = 0.000001;
+        BigDecimal s = BigDecimal.valueOf(0.000001);
+
         while (x.compareTo(BigDecimal.valueOf(0)) > 0) {
             x_m = x;
             x = BigDecimal.valueOf(0);
             for (int k = 0; k <= term; k++) {
-                BigDecimal tempX = x.add(tempPaymentSchedule.get(k).divide((BigDecimal.
-                        valueOf(((1 + listEk.get(k) * i) * Math.pow((1 + i), listQk.get(k))))), 6, RoundingMode.FLOOR));
-                x = tempX;
+
+                // (1 + ek*i) ---> divisor1
+                BigDecimal divisor1 = i.multiply(BigDecimal.valueOf(listEk.get(k))).add(BigDecimal.valueOf(1.0));
+
+                // (1 + i)^qk ---> divisor2
+                BigDecimal divisor2 = (i.add(BigDecimal.valueOf(1))).pow(listQk.get(k));
+
+                //divisor1 * divisor2
+                BigDecimal divisor1MultiplyDivisor2 = divisor1.multiply(divisor2).setScale(6, RoundingMode.HALF_UP);
+
+                x = x.add(tempPaymentSchedule.get(k).divide(divisor1MultiplyDivisor2, 6, RoundingMode.HALF_UP));
+
             }
-            System.out.println(x);
-            i = i + s;
+            i = i.add(s);
         }
         if (x.compareTo(x_m) > 0) {
-            i = i - s;
+            i = i.subtract(s);
         }
 
-        BigDecimal psk = BigDecimal.valueOf(Math.floor(i * 12 * 100 * 1000) / 1000);
+        BigDecimal psk = i.multiply(BigDecimal.valueOf((double) 365 / 30 * 100)).setScale(6, RoundingMode.HALF_UP);
 
         for (int n = 1; n <= term; n++) {
             BigDecimal totalPayment = tempMonthlyPayment.multiply(BigDecimal.valueOf(n));
-            BigDecimal remainingDebt = amount.subtract(totalPayment);
-            BigDecimal interestPayment = remainingDebt.multiply(BigDecimal.valueOf(i));
+            BigDecimal remainingDebt = totalLoanCostWithInterestsPayments.subtract(totalPayment);
+            BigDecimal interestPayment = remainingDebt.multiply(i);
             BigDecimal debtPayment = tempMonthlyPayment.subtract(interestPayment);
 
             paymentSchedule.add(new PaymentScheduleElement(n, dateOfPayment.get(n),
                     totalPayment, interestPayment, debtPayment, remainingDebt));
         }
 
+        log.info("Total loan amount with interest " + totalLoanCostWithInterestsPayments + ", monthly payment " + tempMonthlyPayment + ", psk " + psk +
+                ", rate " + BigDecimal.valueOf(rate).setScale(2, RoundingMode.HALF_UP) +
+                ", insurance " + isInsuranceEnabled + ", is salary client " + isSalaryClient);
+
         return new CreditDTO(amount, term, tempMonthlyPayment, BigDecimal.valueOf(rate),
                 psk, isInsuranceEnabled, isSalaryClient, paymentSchedule);
-
-
     }
 
 

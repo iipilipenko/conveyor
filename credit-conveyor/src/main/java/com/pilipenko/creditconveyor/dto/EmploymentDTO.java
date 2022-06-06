@@ -2,7 +2,9 @@ package com.pilipenko.creditconveyor.dto;
 
 import com.pilipenko.creditconveyor.enums.EmploymentStatus;
 import com.pilipenko.creditconveyor.enums.JobPosition;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -10,6 +12,8 @@ import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class EmploymentDTO {
 
     @Enumerated(EnumType.STRING)
