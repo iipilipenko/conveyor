@@ -60,7 +60,7 @@ public class ConveyorService {
         log.info("Pre scoring loan offer insurance: " + isInsuranceEnabled + " salary client: " + isSalaryClient);
 
         Double rate = baseRate;
-        BigDecimal additionalServicesAmount = new BigDecimal(0);
+        BigDecimal additionalServicesAmount;
         BigDecimal totalAmount = loanApplicationRequestDTO.getAmount();
 
         if (isSalaryClient) {
@@ -71,7 +71,7 @@ public class ConveyorService {
         if (isInsuranceEnabled) {
             rate -= 3;
             log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Rate decreased by 3 - insurance enabled");
-            additionalServicesAmount = totalAmount.multiply(new BigDecimal(0.01)).setScale(2, RoundingMode.HALF_UP);
+            additionalServicesAmount = totalAmount.multiply(BigDecimal.valueOf(0.01)).setScale(2, RoundingMode.HALF_UP);
             log.info(loanApplicationRequestDTO.getFirstName() + " " + loanApplicationRequestDTO.getLastName() + " Insurance coast " + additionalServicesAmount);
             totalAmount = totalAmount.add(additionalServicesAmount).setScale(2, RoundingMode.HALF_UP);
 
@@ -252,33 +252,37 @@ public class ConveyorService {
             listQk.add((int) Math.floor(temDaysFromCreditToPayment / 30));
         }
 
-        BigDecimal i = BigDecimal.valueOf(0.011875);
-        BigDecimal x = BigDecimal.valueOf(1.0);
-        BigDecimal x_m = BigDecimal.valueOf(0.0);
-        BigDecimal s = BigDecimal.valueOf(0.000001);
+        BigDecimal i = BigDecimal.valueOf(0);
+        BigDecimal x = BigDecimal.valueOf(0);
+        BigDecimal i_max = BigDecimal.valueOf(rate * 2);
+        BigDecimal i_temp;
+        BigDecimal s = BigDecimal.valueOf(0.0000001);
+        int count = 0;
 
-        while (x.compareTo(BigDecimal.valueOf(0)) > 0) {
-            x_m = x;
+
+        while (i.subtract(i_max).abs().compareTo(s) > 0) {
             x = BigDecimal.valueOf(0);
+            count++;
             for (int k = 0; k <= term; k++) {
-
                 // (1 + ek*i) ---> divisor1
                 BigDecimal divisor1 = i.multiply(BigDecimal.valueOf(listEk.get(k))).add(BigDecimal.valueOf(1.0));
-
                 // (1 + i)^qk ---> divisor2
                 BigDecimal divisor2 = (i.add(BigDecimal.valueOf(1))).pow(listQk.get(k));
-
                 //divisor1 * divisor2
                 BigDecimal divisor1MultiplyDivisor2 = divisor1.multiply(divisor2).setScale(6, RoundingMode.HALF_UP);
-
                 x = x.add(tempPaymentSchedule.get(k).divide(divisor1MultiplyDivisor2, 6, RoundingMode.HALF_UP));
-
             }
-            i = i.add(s);
+
+            if (x.compareTo(BigDecimal.valueOf(0)) < 0) {
+                i_temp = i;
+                i = i.subtract(i.subtract(i_max).abs().divide(BigDecimal.valueOf(2), 7, RoundingMode.HALF_UP));
+                i_max = i_temp;
+            } else {
+                i = i.add(i.subtract(i_max).abs().divide(BigDecimal.valueOf(2), 7, RoundingMode.HALF_UP));
+            }
         }
-        if (x.compareTo(x_m) > 0) {
-            i = i.subtract(s);
-        }
+        log.info("takes " + count + " iterations to calculate i");
+
 
         BigDecimal psk = i.multiply(BigDecimal.valueOf((double) 365 / 30 * 100)).setScale(6, RoundingMode.HALF_UP);
 
