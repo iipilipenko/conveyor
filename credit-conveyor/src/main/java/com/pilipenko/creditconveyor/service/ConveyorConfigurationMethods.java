@@ -83,20 +83,20 @@ public class ConveyorConfigurationMethods {
 
         Double currentRate = conveyorConfigurationParams.getBaseRate();
 
-        log.info(requestId + "Base rate is: " + currentRate);
+        log.info(requestId + " Base rate is: " + currentRate);
 
         switch (employmentStatus) {
             case WORKING:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusWorkingOnTheRate();
-                log.info(requestId + "Rate increased by 0.5 - worker");
+                log.info(requestId + " Rate increased by 0.5 - worker");
                 break;
             case ENTREPRENEUR:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusEntrepreneurOnTheRate();
-                log.info(requestId + "Rate increased by 3 - entrepreneur");
+                log.info(requestId + " Rate increased by 3 - entrepreneur");
                 break;
             case SELF_EMPLOYED:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusSelfEmployedOnTheRate();
-                log.info(requestId + "Rate increased by 1 - self employed");
+                log.info(requestId + " Rate increased by 1 - self employed");
                 break;
             case JOBLESS:
             default:
@@ -107,15 +107,15 @@ public class ConveyorConfigurationMethods {
         switch (jobPosition) {
             case JUNIOR:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusJuniorOnTheRate();
-                log.info(requestId + "Rate increased by 1 - junior");
+                log.info(requestId + " Rate increased by 1 - junior");
                 break;
             case MIDDLE:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusMiddleOnTheRate();
-                log.info(requestId + "Rate decreased by 1 - middle");
+                log.info(requestId + " Rate decreased by 1 - middle");
                 break;
             case SENIOR:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusSeniorOnTheRate();
-                log.info(requestId + "Rate decreased by 2 - senior");
+                log.info(requestId + " Rate decreased by 2 - senior");
                 break;
             default:
                 log.warn("Denial of a loan - incorrect work position");
@@ -130,14 +130,14 @@ public class ConveyorConfigurationMethods {
         switch (martialStatus) {
             case MARRIED:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusMarriedOnTheRate();
-                log.info(requestId + "Rate decreased by 3 - married");
+                log.info(requestId + " Rate decreased by 3 - married");
                 break;
             case SINGLE:
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusSingleOnTheRate();
-                log.info(requestId + "Rate increased by 1 - single");
+                log.info(requestId + " Rate increased by 1 - single");
                 break;
             case DIVORCE:
-                log.info(requestId + "Rate increased by 3 - divorce");
+                log.info(requestId + " Rate increased by 3 - divorce");
                 currentRate += conveyorConfigurationParams.getInfluenceOfStatusDivorceOnTheRate();
                 break;
             default:
@@ -146,7 +146,7 @@ public class ConveyorConfigurationMethods {
         }
         if (dependentAmount > conveyorConfigurationParams.getMinCountDependentAmountWillInfluenceRate()) {
             currentRate += conveyorConfigurationParams.getInfluenceOfDependentAmountOnTheRate();
-            log.info(requestId + "Rate increased by 1 - dependent amount > 1");
+            log.info(requestId + " Rate increased by 1 - dependent amount > 1");
         }
         if (Period.between(birthDate, LocalDate.now()).getYears() < conveyorConfigurationParams.getMinAge() ||
                 Period.between(birthDate, LocalDate.now()).getYears() > conveyorConfigurationParams.getMaxAge()) {
@@ -157,16 +157,16 @@ public class ConveyorConfigurationMethods {
                 && (Period.between(birthDate, LocalDate.now()).getYears() > conveyorConfigurationParams.getMinMaleReliableAge()
                 || Period.between(birthDate, LocalDate.now()).getYears() < conveyorConfigurationParams.getMaxMaleReliableAge())) {
             currentRate += conveyorConfigurationParams.getInfluenceReliableAgeOnRate();
-            log.info(requestId + "Rate decreased by 3 - male >30 <55 y.o");
+            log.info(requestId + " Rate decreased by 3 - male >30 <55 y.o");
         }
         if (gender == Gender.FEMALE
                 && (Period.between(birthDate, LocalDate.now()).getYears() > conveyorConfigurationParams.getMaxFemaleReliableAge()
                 || Period.between(birthDate, LocalDate.now()).getYears() < conveyorConfigurationParams.getMaxFemaleReliableAge())) {
             currentRate += conveyorConfigurationParams.getInfluenceReliableAgeOnRate();
-            log.info(requestId + "Rate decreased by 3 - female >35 <60 y.o");
+            log.info(requestId + " Rate decreased by 3 - female >35 <60 y.o");
         }
         if (gender == Gender.OTHER) {
-            log.info(requestId + "Rate increased by 3 - just because non binary gender");
+            log.info(requestId + " Rate increased by 3 - just because non binary gender");
             currentRate += conveyorConfigurationParams.getInfluenceOfGenderOtherOnRate();
         }
         if (currentWorkingExperience < conveyorConfigurationParams.getMinCurrentWorkExperience()
@@ -176,20 +176,20 @@ public class ConveyorConfigurationMethods {
         }
         if (isInsuranceEnabled) {
             currentRate += conveyorConfigurationParams.getInfluenceOfInsuranceOnTheRate();
-            log.info(requestId + "Rate decreased by 3 - insurance enabled");
+            log.info(requestId + " Rate decreased by 3 - insurance enabled");
         }
         if (isSalaryClient) {
-            log.info(requestId + "Rate decreased by 1 - is salary client");
+            log.info(requestId + " Rate decreased by 1 - is salary client");
             currentRate += conveyorConfigurationParams.getInfluenceOfSalaryClientOnTheRate();
         }
-        log.info(requestId + "rate after scoring is " + currentRate);
+        log.info(requestId + " rate after scoring is " + currentRate);
         return currentRate;
     }
 
     public CreditDTO calculateCreditParams(double rate, BigDecimal amount,
                                            int term, boolean isInsuranceEnabled, boolean isSalaryClient, Long requestId) {
 
-        log.info(requestId + "Calculating credit params");
+        log.info(requestId + " Calculating credit params");
 
         List<BigDecimal> tempPaymentSchedule = new ArrayList<>();
         List<Integer> listQk = new ArrayList<>();
@@ -206,7 +206,7 @@ public class ConveyorConfigurationMethods {
         BigDecimal tempMonthlyPayment = amount.multiply(BigDecimal.valueOf((rate / (100 * 12))
                 / (1 - Math.pow((1 + (rate / (100 * 12))), -term))));
         BigDecimal totalLoanCostWithInterestsPayments = tempMonthlyPayment.multiply(BigDecimal.valueOf(term));
-        log.info(requestId + "totalLoanCostWithInterestsPayments ------------>" + totalLoanCostWithInterestsPayments);
+        log.info(requestId + " totalLoanCostWithInterestsPayments ------------>" + totalLoanCostWithInterestsPayments);
 
         for (int i = 0; i <= term; i++) {
             if (i != 0) {
@@ -261,7 +261,7 @@ public class ConveyorConfigurationMethods {
                 i = i.add(i.subtract(i_max).abs().divide(BigDecimal.valueOf(2), 7, RoundingMode.HALF_UP));
             }
         }
-        log.info(requestId + "takes " + count + " iterations to calculate i");
+        log.info(requestId + " takes " + count + " iterations to calculate i");
 
         // psk = i * CBP * 100
         // CBP = 365/30
@@ -277,7 +277,7 @@ public class ConveyorConfigurationMethods {
                     totalPayment, interestPayment, debtPayment, remainingDebt));
         }
 
-        log.info(requestId + "Total loan amount with interest " + totalLoanCostWithInterestsPayments + ", monthly payment "
+        log.info(requestId + " Total loan amount with interest " + totalLoanCostWithInterestsPayments + ", monthly payment "
                 + tempMonthlyPayment + ", psk " + psk + ", rate " + BigDecimal.valueOf(rate).setScale(2, RoundingMode.HALF_UP) +
                 ", insurance " + isInsuranceEnabled + ", is salary client " + isSalaryClient);
 
