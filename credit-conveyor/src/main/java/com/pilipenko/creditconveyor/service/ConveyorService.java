@@ -16,15 +16,21 @@ import java.util.*;
 public class ConveyorService {
 
     @Autowired
-    public ConveyorConfigurationMethods conveyorConfigurationMethods;
+    public PreScoringAndLoanOfferConfiguration preScoringAndLoanOfferConfiguration;
+
+    @Autowired
+    public RateScoring rateScoring;
+
+    @Autowired
+    public CreditParamsConfiguration creditParamsConfiguration;
 
     public List<LoanOfferDTO> createLoanOffers(@Valid LoanApplicationRequestDTO loanApplicationRequestDTO) {
         Long applicationId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         ArrayList<LoanOfferDTO> loanOffers = new ArrayList<>();
-        loanOffers.add(conveyorConfigurationMethods.createLoanOfferDTO(true, true, loanApplicationRequestDTO, applicationId));
-        loanOffers.add(conveyorConfigurationMethods.createLoanOfferDTO(false, false, loanApplicationRequestDTO, applicationId));
-        loanOffers.add(conveyorConfigurationMethods.createLoanOfferDTO(true, false, loanApplicationRequestDTO, applicationId));
-        loanOffers.add(conveyorConfigurationMethods.createLoanOfferDTO(false, true, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(preScoringAndLoanOfferConfiguration.createLoanOfferDTO(true, true, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(preScoringAndLoanOfferConfiguration.createLoanOfferDTO(false, false, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(preScoringAndLoanOfferConfiguration.createLoanOfferDTO(true, false, loanApplicationRequestDTO, applicationId));
+        loanOffers.add(preScoringAndLoanOfferConfiguration.createLoanOfferDTO(false, true, loanApplicationRequestDTO, applicationId));
 
         Comparator<LoanOfferDTO> rateComparator = Comparator.comparing(LoanOfferDTO::getRate);
         loanOffers.sort(Collections.reverseOrder(rateComparator));
@@ -35,7 +41,7 @@ public class ConveyorService {
 
         Long requestId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
-        Double rate = conveyorConfigurationMethods.calculateRate(scoringDataDTO.getEmployment().getEmploymentStatus(), scoringDataDTO.getEmployment().getPosition(),
+        Double rate = rateScoring.calculateRate(scoringDataDTO.getEmployment().getEmploymentStatus(), scoringDataDTO.getEmployment().getPosition(),
                 scoringDataDTO.getEmployment().getSalary(), scoringDataDTO.getMaritalStatus(), scoringDataDTO.getDependentAmount(),
                 scoringDataDTO.getBirthdate(), scoringDataDTO.getGender(), scoringDataDTO.getEmployment().getWorkExperienceCurrent(),
                 scoringDataDTO.getEmployment().getWorkExperienceTotal(), scoringDataDTO.getIsInsuranceEnabled(),
@@ -45,7 +51,7 @@ public class ConveyorService {
             return null;
         }
 
-        return conveyorConfigurationMethods.calculateCreditParams(rate, scoringDataDTO.getAmount(), scoringDataDTO.getTerm(),
+        return creditParamsConfiguration.calculateCreditParams(rate, scoringDataDTO.getAmount(), scoringDataDTO.getTerm(),
                 scoringDataDTO.getIsInsuranceEnabled(), scoringDataDTO.getIsSalaryClient(), requestId);
 
     }
