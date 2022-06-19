@@ -1,0 +1,43 @@
+package com.pilipenko.deal.service;
+
+import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
+import com.pilipenko.deal.model.Client;
+import com.pilipenko.deal.model.ClientID;
+import com.pilipenko.deal.repository.ClientRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.swing.text.html.parser.Entity;
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class ClientServiceImpl implements ClientService {
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Override
+    public Long createNew(LoanApplicationRequestDTO loanApplicationRequestDTO) {
+        List<Client> clients = clientRepository.findByNumberAndSeries(Integer.parseInt(loanApplicationRequestDTO.getPassportNumber()),
+                Integer.parseInt(loanApplicationRequestDTO.getPassportSeries()));
+        Client client = clients.isEmpty() ? new Client() : clients.get(0);
+        client = client.setBirthDate(loanApplicationRequestDTO.getBirthdate())
+                .setEmail(loanApplicationRequestDTO.getEmail())
+                .setLastName(loanApplicationRequestDTO.getLastName())
+                .setFirstName(loanApplicationRequestDTO.getFirstName())
+                .setMiddleName(loanApplicationRequestDTO.getMiddleName());
+        log.info(String.format("created new client: %s", client));
+
+        return clientRepository.save(client).getId();
+
+
+    }
+}

@@ -1,5 +1,7 @@
 package com.pilipenko.deal.controller;
 
+import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
+import com.pilipenko.deal.dto.LoanOfferDTO;
 import com.pilipenko.deal.service.DealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Validated
 @Slf4j
