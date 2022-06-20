@@ -4,6 +4,7 @@ import com.pilipenko.deal.enums.Gender;
 import com.pilipenko.deal.enums.MartialStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
@@ -15,16 +16,19 @@ import java.time.LocalDate;
 @Data
 @Accessors(chain = true)
 @Entity
-@IdClass(ClientID.class)
+@NoArgsConstructor
+//@IdClass(ClientID.class)
 public class Client {
 
-    private Integer series;
-    private Integer number;
 //    @EmbeddedId
 //    private ClientID id;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    private String series;
+
+    private String number;
 
     private LocalDate issueDate;
 

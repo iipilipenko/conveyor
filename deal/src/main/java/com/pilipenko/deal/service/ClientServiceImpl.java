@@ -2,7 +2,6 @@ package com.pilipenko.deal.service;
 
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.model.Client;
-import com.pilipenko.deal.model.ClientID;
 import com.pilipenko.deal.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +25,13 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Long createNew(LoanApplicationRequestDTO loanApplicationRequestDTO) {
-        List<Client> clients = clientRepository.findByNumberAndSeries(Integer.parseInt(loanApplicationRequestDTO.getPassportNumber()),
-                Integer.parseInt(loanApplicationRequestDTO.getPassportSeries()));
+        List<Client> clients = clientRepository.findByNumberAndSeries(loanApplicationRequestDTO.getPassportNumber(),
+                loanApplicationRequestDTO.getPassportSeries());
         Client client = clients.isEmpty() ? new Client() : clients.get(0);
+        log.warn("CLIENTS "+ clients.toString());
         client = client.setBirthDate(loanApplicationRequestDTO.getBirthdate())
+                .setSeries(loanApplicationRequestDTO.getPassportSeries())
+                .setNumber(loanApplicationRequestDTO.getPassportNumber())
                 .setEmail(loanApplicationRequestDTO.getEmail())
                 .setLastName(loanApplicationRequestDTO.getLastName())
                 .setFirstName(loanApplicationRequestDTO.getFirstName())
