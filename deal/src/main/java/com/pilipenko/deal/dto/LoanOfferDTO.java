@@ -5,15 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoanOfferDTO {
 
+    @Id
     @NotNull
     private Long applicationId;
 

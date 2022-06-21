@@ -15,7 +15,7 @@ public class Employment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "employmentId")
     private Long id;
 
     private EmploymentStatus employmentStatus;

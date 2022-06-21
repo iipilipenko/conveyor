@@ -17,11 +17,8 @@ import java.time.LocalDate;
 @Accessors(chain = true)
 @Entity
 @NoArgsConstructor
-//@IdClass(ClientID.class)
 public class Client {
 
-//    @EmbeddedId
-//    private ClientID id;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

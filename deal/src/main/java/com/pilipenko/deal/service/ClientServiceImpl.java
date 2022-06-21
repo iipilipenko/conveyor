@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -39,7 +40,6 @@ public class ClientServiceImpl implements ClientService {
         log.info(String.format("created new client: %s", client));
 
         return clientRepository.save(client).getId();
-
-
     }
+
 }
