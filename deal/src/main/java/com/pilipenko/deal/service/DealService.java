@@ -3,6 +3,10 @@ package com.pilipenko.deal.service;
 
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.dto.LoanOfferDTO;
+import com.pilipenko.deal.enums.ApplicationStatus;
+import com.pilipenko.deal.model.Application;
+import com.pilipenko.deal.model.Client;
+import com.pilipenko.deal.model.StatusHistory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +14,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +31,12 @@ public class DealService {
     private ClientService clientService;
 
     @Autowired
+    private ApplicationService applicationService;
+
+    @Autowired
+    private StatusHistoryService statusHistoryService;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     @Value("${conveyor.offers.url}")
@@ -33,7 +44,9 @@ public class DealService {
 
     public List<LoanOfferDTO> getLoanOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
             try {
-                clientService.createNew(loanApplicationRequestDTO);
+                Client client = clientService.createNew(loanApplicationRequestDTO);
+                Application application = applicationService.createNew(client);
+                statusHistoryService.updateStatus(application, ApplicationStatus.PREAPPROVAL);
 
                 RequestEntity<LoanApplicationRequestDTO> requestEntity = RequestEntity
                         .post(new URI(conveyorOffersUrl))
@@ -48,10 +61,26 @@ public class DealService {
                         });
 
                 List<LoanOfferDTO> offersList = responseEntity.getBody();
-
-            } catch (URISyntaxException | NullPointerException e) {
+                offersList.stream()
+                        .sorted(Collections.reverseOrder(Comparator.comparing(LoanOfferDTO::getRate)))
+                        .forEach(s-> s.setApplicationId(application.getId()));
+                return offersList;
+            } catch (URISyntaxException | NullPointerException | HttpClientErrorException e) {
                 log.error(e.getMessage());
             }
         return null;
+    }
+
+    public HttpStatus updateLoanOffers (LoanOfferDTO loanOfferDTO) {
+        try {
+            Application application = applicationService.findById(loanOfferDTO.getApplicationId());
+            applicationService.updateCurrentStatus(ApplicationStatus.APPROVED, application);
+            statusHistoryService.updateStatus(application, ApplicationStatus.APPROVED);
+
+
+        } catch (NullPointerException e) {
+            log.error(e.getMessage());
+        }
+    return HttpStatus.BAD_REQUEST;
     }
 }

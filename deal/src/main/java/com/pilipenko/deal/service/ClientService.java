@@ -1,9 +1,10 @@
 package com.pilipenko.deal.service;
 
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
+import com.pilipenko.deal.model.Client;
 
 public interface ClientService {
 
-    Long createNew(LoanApplicationRequestDTO loanApplicationRequestDTO);
+    Client createNew(LoanApplicationRequestDTO loanApplicationRequestDTO);
 
 }

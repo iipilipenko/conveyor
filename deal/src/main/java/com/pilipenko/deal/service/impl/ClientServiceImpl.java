@@ -1,8 +1,9 @@
-package com.pilipenko.deal.service;
+package com.pilipenko.deal.service.impl;
 
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.model.Client;
 import com.pilipenko.deal.repository.ClientRepository;
+import com.pilipenko.deal.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
 
     @Override
-    public Long createNew(LoanApplicationRequestDTO loanApplicationRequestDTO) {
+    public Client createNew(LoanApplicationRequestDTO loanApplicationRequestDTO) {
         List<Client> clients = clientRepository.findByNumberAndSeries(loanApplicationRequestDTO.getPassportNumber(),
                 loanApplicationRequestDTO.getPassportSeries());
         Client client = clients.isEmpty() ? new Client() : clients.get(0);
@@ -39,7 +40,7 @@ public class ClientServiceImpl implements ClientService {
                 .setMiddleName(loanApplicationRequestDTO.getMiddleName());
         log.info(String.format("created new client: %s", client));
 
-        return clientRepository.save(client).getId();
+        return clientRepository.save(client);
     }
 
 }

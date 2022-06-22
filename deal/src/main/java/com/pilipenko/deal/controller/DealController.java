@@ -49,16 +49,13 @@ public class DealController {
                 : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
-//    @PutMapping(value = "/deal/offer", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
-//            MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<LoanOfferDTO> getLoanOffers(@RequestBody @Valid LoanApplicationRequestDTO loanApplicationRequestDTO) {
-//
-//        final List<LoanOfferDTO> offerDTOList = dealService.createLoanOffers(loanApplicationRequestDTO);
-//
-//        return offerDTOList != null
-//                ? new ResponseEntity<>(offerDTOList, HttpStatus.OK)
-//                : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-//    }
+    @PutMapping(value = "/deal/offer", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> updateLoanOffers(@RequestBody @Valid LoanOfferDTO loanOfferDTO) {
+
+        return new ResponseEntity<>(dealService.updateLoanOffers(loanOfferDTO));
+
+    }
 
 
 }
