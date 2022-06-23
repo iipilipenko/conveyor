@@ -17,12 +17,14 @@ public class Employment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private EmploymentStatus employmentStatus;
 
     private String employer;
 
     private BigDecimal salary;
 
+    @Enumerated(EnumType.STRING)
     private JobPosition jobPosition;
 
     private Integer currentWorkExperience;

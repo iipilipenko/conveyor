@@ -1,7 +1,8 @@
 package com.pilipenko.deal.controller;
 
+import com.pilipenko.deal.dto.FinishRegistrationRequestDTO;
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
-import com.pilipenko.deal.dto.LoanOfferDTO;
+import com.pilipenko.deal.model.LoanOfferDTO;
 import com.pilipenko.deal.service.DealService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -49,6 +47,13 @@ public class DealController {
                 : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Update application status and status history, set applied loan offer to application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid input",
+                    content = @Content)})
     @PutMapping(value = "/deal/offer", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
             MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> updateLoanOffers(@RequestBody @Valid LoanOfferDTO loanOfferDTO) {
@@ -57,5 +62,20 @@ public class DealController {
 
     }
 
+    @Operation(summary = "Finish registration, final credit scoring, save all data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid input",
+                    content = @Content)})
+    @PutMapping(value = "/deal/calculate/{applicationId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> finishRegistrationAndCalculatingCredit(@RequestBody @Valid FinishRegistrationRequestDTO finishRegistrationRequestDTO,
+                                                                             @PathVariable("applicationId") Long  applicationId) {
+
+        return new ResponseEntity<>(dealService.finishRegistrationAndCalculatingCredit(finishRegistrationRequestDTO, applicationId));
+
+    }
 
 }

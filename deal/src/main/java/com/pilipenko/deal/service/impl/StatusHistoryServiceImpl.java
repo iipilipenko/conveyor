@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class StatusHistoryImpl implements StatusHistoryService {
+public class StatusHistoryServiceImpl implements StatusHistoryService {
 
     @Autowired
     private StatusHistoryRepository statusHistoryRepository;

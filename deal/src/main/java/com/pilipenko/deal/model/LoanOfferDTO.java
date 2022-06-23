@@ -1,4 +1,4 @@
-package com.pilipenko.deal.dto;
+package com.pilipenko.deal.model;
 
 import jdk.jfr.BooleanFlag;
 import lombok.AllArgsConstructor;

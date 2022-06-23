@@ -1,12 +1,14 @@
 package com.pilipenko.deal.service;
 
 
+import com.pilipenko.deal.dto.FinishRegistrationRequestDTO;
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
-import com.pilipenko.deal.dto.LoanOfferDTO;
+import com.pilipenko.deal.model.Credit;
+import com.pilipenko.deal.model.LoanOfferDTO;
+import com.pilipenko.deal.dto.ScoringDataDTO;
 import com.pilipenko.deal.enums.ApplicationStatus;
 import com.pilipenko.deal.model.Application;
 import com.pilipenko.deal.model.Client;
-import com.pilipenko.deal.model.StatusHistory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,9 @@ public class DealService {
     private ClientService clientService;
 
     @Autowired
+    private CreditService creditService;
+
+    @Autowired
     private ApplicationService applicationService;
 
     @Autowired
@@ -46,6 +51,9 @@ public class DealService {
             try {
                 Client client = clientService.createNew(loanApplicationRequestDTO);
                 Application application = applicationService.createNew(client);
+                Credit credit = creditService.createNewCredit(loanApplicationRequestDTO);
+                applicationService.updateCurrentStatus(ApplicationStatus.PREAPPROVAL, application);
+                applicationService.setCredit(application, credit);
                 statusHistoryService.updateStatus(application, ApplicationStatus.PREAPPROVAL);
 
                 RequestEntity<LoanApplicationRequestDTO> requestEntity = RequestEntity
@@ -76,11 +84,25 @@ public class DealService {
             Application application = applicationService.findById(loanOfferDTO.getApplicationId());
             applicationService.updateCurrentStatus(ApplicationStatus.APPROVED, application);
             statusHistoryService.updateStatus(application, ApplicationStatus.APPROVED);
-
-
+            applicationService.setAppliedLoanOffer(loanOfferDTO);
+            return HttpStatus.OK;
         } catch (NullPointerException e) {
             log.error(e.getMessage());
         }
     return HttpStatus.BAD_REQUEST;
     }
+
+    public HttpStatus finishRegistrationAndCalculatingCredit (FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId) {
+//        try {
+//           Application application = applicationService.findById(applicationId);
+//           ScoringDataDTO scoringDataDTO = new ScoringDataDTO()
+//
+//
+//        } catch (URISyntaxException | NullPointerException | HttpClientErrorException e) {
+//            log.error(e.getMessage());
+//        }
+//        return HttpStatus.BAD_REQUEST;
+        return null;
+   }
+
 }

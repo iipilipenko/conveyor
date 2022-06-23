@@ -19,11 +19,21 @@ public class StatusHistory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus applicationStatus;
 
     private LocalDate localDate;
 
     @ManyToOne
-    @JoinColumn(name = "application_id")
+    @JoinColumn(name = "application_id", nullable = false)
     private Application application;
+
+    @Override
+    public String toString() {
+        return "StatusHistory{" +
+                "id=" + id +
+                ", applicationStatus=" + applicationStatus +
+                ", localDate=" + localDate +
+                '}';
+    }
 }

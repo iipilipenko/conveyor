@@ -3,6 +3,8 @@ package com.pilipenko.deal.model;
 import com.pilipenko.deal.dto.PaymentScheduleElement;
 import com.pilipenko.deal.enums.CreditStatus;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -12,9 +14,11 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @Entity
+@RequiredArgsConstructor
 public class Credit {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private BigDecimal amount;
@@ -34,5 +38,6 @@ public class Credit {
 
     private Boolean isSalaryClient;
 
+    @Enumerated(EnumType.STRING)
     private CreditStatus creditStatus;
 }

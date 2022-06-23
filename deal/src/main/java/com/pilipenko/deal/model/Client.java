@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Data
@@ -41,13 +42,15 @@ public class Client {
 
     private String email;
 
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Enumerated(EnumType.STRING)
     private MartialStatus maritalStatus;
 
     private Integer dependentAmount;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "employment_id", referencedColumnName = "id")
     private Employment employment;
 

@@ -1,6 +1,8 @@
 package com.pilipenko.deal.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -11,6 +13,7 @@ import java.time.LocalDate;
 @Data
 @Accessors(chain = true)
 @Entity
+@RequiredArgsConstructor
 public class PaymentSchedule {
 
     @Id
