@@ -34,11 +34,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public void updateCurrentStatus(ApplicationStatus applicationStatus, Application application) {
-//        application.setApplicationStatus(applicationStatus);
-        Application application1 = applicationRepository.findApplicationById(application.getId());
-        application1.setApplicationStatus(applicationStatus);
-        applicationRepository.save(application1);
-        log.info(String.format("current application status updated: %s", application1));
+        application.setApplicationStatus(applicationStatus);
+        applicationRepository.save(application);
+        log.info(String.format("current application status updated: %s", application));
     }
 
     @Override
@@ -53,11 +51,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     public Application findById(Long id) {
         Application application = applicationRepository.findApplicationById(id);
         log.info(String.format("find application: %s", application));
-        if (application == null) {
-            log.error("is null");
-        } else {
-            log.info("not null");
-        }
         return application;
     }
 

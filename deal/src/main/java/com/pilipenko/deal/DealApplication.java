@@ -1,6 +1,8 @@
 package com.pilipenko.deal;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,5 +19,10 @@ public class DealApplication {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public ModelMapper getMapper() {
+        return new ModelMapper();
     }
 }

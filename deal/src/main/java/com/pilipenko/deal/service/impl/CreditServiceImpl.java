@@ -2,6 +2,7 @@ package com.pilipenko.deal.service.impl;
 
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.model.Credit;
+import com.pilipenko.deal.model.LoanOfferDTO;
 import com.pilipenko.deal.repository.CreditRepository;
 import com.pilipenko.deal.service.CreditService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,13 @@ public class CreditServiceImpl implements CreditService {
                 .setAmount(loanApplicationRequestDTO.getAmount())
                 .setTerm(loanApplicationRequestDTO.getTerm());
         log.info(String.format("New credit saved: %s",credit));
+        return creditRepository.save(credit);
+    }
+
+    @Override
+    public Credit updateTotalCreditAmountWithAppliedOffer(Credit credit, LoanOfferDTO loanOfferDTO) {
+        credit.setAmount(loanOfferDTO.getTotalAmount());
+        log.info(String.format("Credit total amount updated with applied offer: amount %s",credit.getAmount()));
         return creditRepository.save(credit);
     }
 }

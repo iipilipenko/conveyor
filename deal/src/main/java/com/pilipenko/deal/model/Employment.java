@@ -22,13 +22,15 @@ public class Employment {
 
     private String employer;
 
+    private String employerINN;
+
     private BigDecimal salary;
 
     @Enumerated(EnumType.STRING)
-    private JobPosition jobPosition;
+    private JobPosition position;
 
-    private Integer currentWorkExperience;
+    private Integer workExperienceCurrent;
 
-    private Integer totalWorkExperience;
+    private Integer workExperienceTotal;
 
 }

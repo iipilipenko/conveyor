@@ -1,5 +1,6 @@
 package com.pilipenko.deal.service.impl;
 
+import com.pilipenko.deal.dto.FinishRegistrationRequestDTO;
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.model.Client;
 import com.pilipenko.deal.repository.ClientRepository;
@@ -40,6 +41,19 @@ public class ClientServiceImpl implements ClientService {
                 .setMiddleName(loanApplicationRequestDTO.getMiddleName());
         log.info(String.format("created new client: %s", client));
 
+        return clientRepository.save(client);
+    }
+
+    @Override
+    public Client updateWithFinishRegistrationData(Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO) {
+        client.setAccount(finishRegistrationRequestDTO.getAccount())
+                .setMaritalStatus(finishRegistrationRequestDTO.getMartialStatus())
+                .setGender(finishRegistrationRequestDTO.getGender())
+                .setDependentAmount(finishRegistrationRequestDTO.getDependentAmount())
+                .setIssueDate(finishRegistrationRequestDTO.getPassportIssueDate())
+                .setIssueBranch(finishRegistrationRequestDTO.getPassportIssueBranch())
+                .setEmployment(finishRegistrationRequestDTO.getEmployment());
+        log.info(String.format("client updated: %s",client));
         return clientRepository.save(client);
     }
 

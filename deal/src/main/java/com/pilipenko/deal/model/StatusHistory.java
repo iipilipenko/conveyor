@@ -30,7 +30,7 @@ public class StatusHistory {
 
     @Override
     public String toString() {
-        return "StatusHistory{" +
+         return "StatusHistory{" +
                 "id=" + id +
                 ", applicationStatus=" + applicationStatus +
                 ", localDate=" + localDate +

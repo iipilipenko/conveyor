@@ -50,8 +50,7 @@ public class Client {
 
     private Integer dependentAmount;
 
-    @OneToOne
-    @JoinColumn(name = "employment_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.ALL)
     private Employment employment;
 
     private String account;

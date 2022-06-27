@@ -19,9 +19,11 @@ import java.time.LocalDate;
 public class FinishRegistrationRequestDTO {
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private MartialStatus martialStatus;
 
     @Enumerated(EnumType.STRING)
