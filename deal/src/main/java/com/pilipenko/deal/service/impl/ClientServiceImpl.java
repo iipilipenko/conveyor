@@ -3,10 +3,12 @@ package com.pilipenko.deal.service.impl;
 import com.pilipenko.deal.dto.FinishRegistrationRequestDTO;
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.model.Client;
+import com.pilipenko.deal.model.Employment;
 import com.pilipenko.deal.repository.ClientRepository;
 import com.pilipenko.deal.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public Client createNew(LoanApplicationRequestDTO loanApplicationRequestDTO) {
@@ -52,7 +57,7 @@ public class ClientServiceImpl implements ClientService {
                 .setDependentAmount(finishRegistrationRequestDTO.getDependentAmount())
                 .setIssueDate(finishRegistrationRequestDTO.getPassportIssueDate())
                 .setIssueBranch(finishRegistrationRequestDTO.getPassportIssueBranch())
-                .setEmployment(finishRegistrationRequestDTO.getEmployment());
+                .setEmployment(modelMapper.map(finishRegistrationRequestDTO.getEmployment(), Employment.class));
         log.info(String.format("client updated: %s",client));
         return clientRepository.save(client);
     }

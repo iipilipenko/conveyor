@@ -1,7 +1,6 @@
 package com.pilipenko.deal.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pilipenko.deal.dto.*;
 import com.pilipenko.deal.model.*;
 import com.pilipenko.deal.enums.ApplicationStatus;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -87,7 +87,7 @@ public class DealService {
         try {
             Application application = applicationService.findById(loanOfferDTO.getApplicationId());
             Credit credit = application.getCredit();
-            creditService.updateTotalCreditAmountWithAppliedOffer(credit, loanOfferDTO);
+            creditService.updateCreditWithAppliedOffer(credit, loanOfferDTO);
             applicationService.updateCurrentStatus(ApplicationStatus.APPROVED, application);
             statusHistoryService.updateStatus(application, ApplicationStatus.APPROVED);
             applicationService.setAppliedLoanOffer(loanOfferDTO);
@@ -144,6 +144,10 @@ public class DealService {
 
             log.info(String.format("Received credit DTO: %s", creditDTO));
 
+            creditService.updateCreditWithCreditDTO(credit, creditDTO);
+            statusHistoryService.updateStatus(application, ApplicationStatus.CC_APPROVED);
+
+            return HttpStatus.OK;
 
         } catch (URISyntaxException | NullPointerException | HttpClientErrorException e) {
             log.error(e.getMessage());

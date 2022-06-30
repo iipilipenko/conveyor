@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 
 @Entity
@@ -22,6 +23,7 @@ public class Employment {
 
     private String employer;
 
+    @Pattern(regexp = "[\\d]{12}")
     private String employerINN;
 
     private BigDecimal salary;

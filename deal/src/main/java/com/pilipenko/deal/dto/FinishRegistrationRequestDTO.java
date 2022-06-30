@@ -37,7 +37,7 @@ public class FinishRegistrationRequestDTO {
     private String passportIssueBranch;
 
     @NotNull
-    private Employment employment;
+    private EmploymentDTO employment;
 
     @NotNull
     private String account;
