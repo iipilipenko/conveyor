@@ -1,5 +1,6 @@
 package com.pilipenko.creditconveyor.dto;
 
+
 import jdk.jfr.BooleanFlag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
