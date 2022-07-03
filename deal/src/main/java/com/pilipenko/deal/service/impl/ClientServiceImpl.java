@@ -50,7 +50,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client updateWithFinishRegistrationData(Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO) {
+    public void updateWithFinishRegistrationData(Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO) {
         client.setAccount(finishRegistrationRequestDTO.getAccount())
                 .setMaritalStatus(finishRegistrationRequestDTO.getMartialStatus())
                 .setGender(finishRegistrationRequestDTO.getGender())
@@ -59,7 +59,7 @@ public class ClientServiceImpl implements ClientService {
                 .setIssueBranch(finishRegistrationRequestDTO.getPassportIssueBranch())
                 .setEmployment(modelMapper.map(finishRegistrationRequestDTO.getEmployment(), Employment.class));
         log.info(String.format("client updated: %s",client));
-        return clientRepository.save(client);
+        clientRepository.save(client);
     }
 
 }

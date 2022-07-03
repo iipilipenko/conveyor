@@ -8,6 +8,6 @@ public interface ClientService {
 
     Client createNew(LoanApplicationRequestDTO loanApplicationRequestDTO);
 
-    Client updateWithFinishRegistrationData (Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO);
+    void updateWithFinishRegistrationData (Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO);
 
 }

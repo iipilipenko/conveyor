@@ -63,5 +63,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     public void setCredit(Application application, Credit credit) {
         application.setCredit(credit);
         log.info("Set credit to application " + application.getId() + " :" + credit.toString());
+        applicationRepository.save(application);
     }
 }
