@@ -81,6 +81,11 @@ class ClientServiceImplTest {
 //        assertEquals(clientReturnedByService, clientReturnedByMock);
 //    }
 
+    @Test
+    void testWorks () {
+        clientService.createNew(new LoanApplicationRequestDTO());
+    }
+
 //    @Test
 //    void testFail () {
 //        clientService.updateWithFinishRegistrationData(new Client(), new FinishRegistrationRequestDTO());
