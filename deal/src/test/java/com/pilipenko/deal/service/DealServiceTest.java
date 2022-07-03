@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.pilipenko.deal.dto.CreditDTO;
+import com.pilipenko.deal.dto.FinishRegistrationRequestDTO;
 import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
-import com.pilipenko.deal.model.Application;
-import com.pilipenko.deal.model.LoanOfferDTO;
+import com.pilipenko.deal.dto.ScoringDataDTO;
+import com.pilipenko.deal.model.*;
+import org.checkerframework.checker.units.qual.A;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,8 +68,8 @@ class DealServiceTest {
     @Test
     void getLoanOffers() throws URISyntaxException {
         List<LoanOfferDTO> offers = new ArrayList<>();
-        for (int i=0; i<4; i++) {
-            offers.add(new LoanOfferDTO().setRate(BigDecimal.valueOf(10+i)));
+        for (int i = 0; i < 4; i++) {
+            offers.add(new LoanOfferDTO().setRate(BigDecimal.valueOf(10 + i)));
         }
         when(applicationService.createNew(ArgumentMatchers.any())).thenReturn(new Application().setId(1L));
         when(restTemplate.postToConveyorOffers(ArgumentMatchers.any())).thenReturn(offers);
@@ -77,6 +80,59 @@ class DealServiceTest {
                 .collect(Collectors.toList()), listReturnedByService);
         assertNotNull(listReturnedByService);
     }
+
+    @Test
+    void getLoanOffersWithInvalidArgs() throws URISyntaxException {
+        when(applicationService.createNew(ArgumentMatchers.any())).thenReturn(null);
+        when(restTemplate.postToConveyorOffers(ArgumentMatchers.any())).thenReturn(null);
+        List<LoanOfferDTO> listReturnedByService = service.getLoanOffers(new LoanApplicationRequestDTO());
+        assertNull(listReturnedByService);
+    }
+
+    @Test
+    void updateLoanOffers () {
+        Credit credit = new Credit();
+        Application application = new Application()
+                .setId(1L)
+                .setCredit(credit);
+        LoanOfferDTO loanOfferDTO = new LoanOfferDTO();
+        loanOfferDTO.setApplicationId(1L);
+        Mockito.when(applicationService.findById(ArgumentMatchers.any())).thenReturn(application);
+        HttpStatus httpStatus = service.updateLoanOffers(loanOfferDTO);
+        assertEquals(HttpStatus.OK, httpStatus);
+        Mockito.verify(creditService, Mockito.times(1))
+                .updateCreditWithAppliedOffer(ArgumentMatchers.same(credit), ArgumentMatchers.same(loanOfferDTO));
+    }
+
+    @Test
+    void updateLoanOffersWithInvalidArgs () {
+        LoanOfferDTO loanOfferDTO = new LoanOfferDTO();
+        HttpStatus httpStatus = service.updateLoanOffers(loanOfferDTO);
+        assertEquals(HttpStatus.BAD_REQUEST, httpStatus);
+    }
+
+    @Test
+    void finishCalcValidArgs () throws URISyntaxException {
+        FinishRegistrationRequestDTO finishRegistrationRequestDTO = new FinishRegistrationRequestDTO();
+        Long appId = 1L;
+        Mockito.when(applicationService.findById(ArgumentMatchers.anyLong())).thenReturn(new Application()
+        .setCredit(new Credit())
+        .setClient(new Client().setEmployment(new Employment())));
+        Mockito.when(restTemplate.postToConveyorCalculation(ArgumentMatchers.any())).thenReturn(new CreditDTO());
+        HttpStatus httpStatus = service.finishRegistrationAndCalculatingCredit(finishRegistrationRequestDTO, appId);
+        assertEquals(HttpStatus.OK, httpStatus);
+    }
+
+    @Test
+    void finishCalcInvalidArgs () {
+        FinishRegistrationRequestDTO finishRegistrationRequestDTO = new FinishRegistrationRequestDTO();
+        Long appId = 1L;
+        Mockito.when(applicationService.findById(ArgumentMatchers.anyLong())).thenReturn(new Application());
+        HttpStatus httpStatus = service.finishRegistrationAndCalculatingCredit(finishRegistrationRequestDTO, appId);
+        assertEquals(HttpStatus.BAD_REQUEST, httpStatus);
+    }
+
+
 
 
 }

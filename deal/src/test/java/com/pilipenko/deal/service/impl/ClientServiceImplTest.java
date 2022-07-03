@@ -9,6 +9,7 @@ import com.pilipenko.deal.enums.Gender;
 import com.pilipenko.deal.enums.JobPosition;
 import com.pilipenko.deal.enums.MartialStatus;
 import com.pilipenko.deal.model.Client;
+import com.pilipenko.deal.model.Employment;
 import com.pilipenko.deal.repository.ClientRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class ClientServiceImplTest {
 
-    private ModelMapper modelMapper = new ModelMapper();
+    @Mock
+    private ModelMapper modelMapper;
 
     @Mock
     private ClientRepository clientRepository;
@@ -61,34 +64,25 @@ class ClientServiceImplTest {
 
 
     //todo check why test for second method does not work
-//    @Test
-//    void updatedWithFinishRegistrationData() {
-//        EmploymentDTO employment = new EmploymentDTO(EmploymentStatus.SELF_EMPLOYED, "123456789012", BigDecimal.valueOf(100000),
-//                JobPosition.JUNIOR, 123, 123);
-//        FinishRegistrationRequestDTO requestDTO = new FinishRegistrationRequestDTO(Gender.FEMALE, MartialStatus.MARRIED, 1,
-//                LocalDate.of(3000, 06, 30), "36006", employment, "account");
-//        Client client = new Client();
-//        Client clientReturnedByMock = new Client()
-//                .setAccount(requestDTO.getAccount())
-//                .setMaritalStatus(requestDTO.getMartialStatus())
-//                .setGender(requestDTO.getGender())
-//                .setDependentAmount(requestDTO.getDependentAmount())
-//                .setIssueDate(requestDTO.getPassportIssueDate())
-//                .setIssueBranch(requestDTO.getPassportIssueBranch())
-//                .setEmployment(modelMapper.map(requestDTO.getEmployment(), Employment.class));
-//        Mockito.when(clientRepository.save(ArgumentMatchers.any())).thenReturn(clientReturnedByMock);
-//        Client clientReturnedByService = clientService.updateWithFinishRegistrationData(client, requestDTO);
-//        assertEquals(clientReturnedByService, clientReturnedByMock);
-//    }
-
     @Test
-    void testWorks () {
-        clientService.createNew(new LoanApplicationRequestDTO());
+    void updatedWithFinishRegistrationData() {
+        Employment employment = new Employment();
+        FinishRegistrationRequestDTO requestDTO = new FinishRegistrationRequestDTO(Gender.FEMALE, MartialStatus.MARRIED, 1,
+                LocalDate.of(3000, 06, 30), "36006", new EmploymentDTO(), "account");
+        Client client = new Client();
+        Client clientReturnedByMock = new Client()
+                .setAccount(requestDTO.getAccount())
+                .setMaritalStatus(requestDTO.getMartialStatus())
+                .setGender(requestDTO.getGender())
+                .setDependentAmount(requestDTO.getDependentAmount())
+                .setIssueDate(requestDTO.getPassportIssueDate())
+                .setIssueBranch(requestDTO.getPassportIssueBranch())
+                .setEmployment(employment);
+        Mockito.when(modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(employment);
+        Mockito.when(clientRepository.save(ArgumentMatchers.any())).thenReturn(clientReturnedByMock);
+        clientService.updateWithFinishRegistrationData(client, requestDTO);
+        Mockito.verify(clientRepository, Mockito.times(1)).save(clientReturnedByMock);
     }
 
-//    @Test
-//    void testFail () {
-//        clientService.updateWithFinishRegistrationData(new Client(), new FinishRegistrationRequestDTO());
-//    }
 
 }

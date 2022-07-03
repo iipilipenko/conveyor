@@ -5,6 +5,7 @@ import com.pilipenko.deal.dto.LoanApplicationRequestDTO;
 import com.pilipenko.deal.dto.ScoringDataDTO;
 import com.pilipenko.deal.model.LoanOfferDTO;
 import com.pilipenko.deal.service.RestTemplateService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

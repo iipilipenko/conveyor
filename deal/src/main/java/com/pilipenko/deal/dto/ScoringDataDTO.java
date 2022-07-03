@@ -6,6 +6,7 @@ import com.pilipenko.deal.validation.Adult;
 import com.pilipenko.deal.validation.MiddleNameEpsonOrCorrect;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ScoringDataDTO {
 
     @NotNull
