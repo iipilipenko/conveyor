@@ -23,10 +23,7 @@ public class ApplicationService {
 
     public List<LoanOfferDTO> createLoanOffers(@Valid LoanApplicationRequestDTO loanApplicationRequestDTO) {
         try {
-            List<LoanOfferDTO> loanOffers = restTemplateService.postToConveyorOffers(loanApplicationRequestDTO);
-            Comparator<LoanOfferDTO> rateComparator = Comparator.comparing(LoanOfferDTO::getRate);
-            loanOffers.sort(Collections.reverseOrder(rateComparator));
-            return loanOffers;
+            return restTemplateService.postToConveyorOffers(loanApplicationRequestDTO);
         } catch (URISyntaxException | NullPointerException e) {
             log.error(e.getMessage());
         }
@@ -40,6 +37,5 @@ public class ApplicationService {
             log.error(e.getMessage());
         }
     }
-
 
 }
