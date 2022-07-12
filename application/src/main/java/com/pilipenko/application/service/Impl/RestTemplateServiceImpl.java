@@ -11,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -42,7 +43,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
                 requestEntity,
                 new ParameterizedTypeReference<List<LoanOfferDTO>>() {
                 });
-
+        log.info(String.format("Post request to /deal/application return offers: %s", responseEntity.getBody()));
         return responseEntity.getBody();
     }
 
