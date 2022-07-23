@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="79525 (generated)" id="1657569778919-1">
+        <createSequence sequenceName="employment_id_seq"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-2">
+        <createSequence sequenceName="hibernate_sequence"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-3">
+        <createTable tableName="application">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="application_status" type="VARCHAR(255)"/>
+            <column name="creation_date" type="date"/>
+            <column name="ses_code" type="VARCHAR(255)"/>
+            <column name="sign_date" type="date"/>
+            <column name="applied_offer_application_id" type="BIGINT"/>
+            <column name="client_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="credit_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-4">
+        <createTable tableName="client">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account" type="VARCHAR(255)"/>
+            <column name="birth_date" type="date"/>
+            <column name="dependent_amount" type="INT"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="gender" type="VARCHAR(255)"/>
+            <column name="issue_branch" type="VARCHAR(255)"/>
+            <column name="issue_date" type="date"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="marital_status" type="VARCHAR(255)"/>
+            <column name="middle_name" type="VARCHAR(255)"/>
+            <column name="number" type="VARCHAR(255)"/>
+            <column name="series" type="VARCHAR(255)"/>
+            <column name="employment_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-5">
+        <createTable tableName="credit">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="numeric(19, 2)"/>
+            <column name="credit_status" type="VARCHAR(255)"/>
+            <column name="is_insurance_enabled" type="BOOL"/>
+            <column name="is_salary_client" type="BOOL"/>
+            <column name="monthly_payment" type="numeric(19, 2)"/>
+            <column name="psk" type="numeric(19, 2)"/>
+            <column name="rate" type="numeric(19, 2)"/>
+            <column name="term" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-6">
+        <createTable tableName="employment">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="employment_pkey"/>
+            </column>
+            <column name="employer" type="VARCHAR(255)"/>
+            <column name="employerinn" type="VARCHAR(255)"/>
+            <column name="employment_status" type="VARCHAR(255)"/>
+            <column name="position" type="VARCHAR(255)"/>
+            <column name="salary" type="numeric(19, 2)"/>
+            <column name="work_experience_current" type="INT"/>
+            <column name="work_experience_total" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-7">
+        <createTable tableName="loan_offerdto">
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_insurance_enabled" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_salary_client" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="monthly_payment" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rate" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requested_amount" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="term" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_amount" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-8">
+        <createTable tableName="payment_schedule">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="date"/>
+            <column name="debt_payment" type="numeric(19, 2)"/>
+            <column name="interest_payment" type="numeric(19, 2)"/>
+            <column name="number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remaining_debt" type="numeric(19, 2)"/>
+            <column name="total_payment" type="numeric(19, 2)"/>
+            <column name="credit_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-9">
+        <createTable tableName="status_history">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="application_status" type="VARCHAR(255)"/>
+            <column name="local_date" type="date"/>
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-10">
+        <addPrimaryKey columnNames="id" constraintName="application_pkey" tableName="application"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-11">
+        <addPrimaryKey columnNames="id" constraintName="client_pkey" tableName="client"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-12">
+        <addPrimaryKey columnNames="id" constraintName="credit_pkey" tableName="credit"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-13">
+        <addPrimaryKey columnNames="application_id" constraintName="loan_offerdto_pkey" tableName="loan_offerdto"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-14">
+        <addPrimaryKey columnNames="id" constraintName="payment_schedule_pkey" tableName="payment_schedule"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-15">
+        <addPrimaryKey columnNames="id" constraintName="status_history_pkey" tableName="status_history"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-16">
+        <addForeignKeyConstraint baseColumnNames="employment_id" baseTableName="client" constraintName="fk2otva1xnql5d427cmbvh9tjh7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="employment"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-17">
+        <addForeignKeyConstraint baseColumnNames="applied_offer_application_id" baseTableName="application" constraintName="fkflkb86t0aptm8e60oi4682f7c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="application_id" referencedTableName="loan_offerdto"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-18">
+        <addForeignKeyConstraint baseColumnNames="credit_id" baseTableName="payment_schedule" constraintName="fkoeyvch7c03mrfm1yd3dtxiaed" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="credit"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-19">
+        <addForeignKeyConstraint baseColumnNames="application_id" baseTableName="status_history" constraintName="fks689w5lh6642eylyn2ijnm7kt" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="application"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-20">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="application" constraintName="fksf5y1x7pt40gk6tvecgimmw7p" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="client"/>
+    </changeSet>
+    <changeSet author="79525 (generated)" id="1657569778919-21">
+        <addForeignKeyConstraint baseColumnNames="credit_id" baseTableName="application" constraintName="fktivv032krrnua6gl76ey13mjm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="credit"/>
+    </changeSet>
+</databaseChangeLog>
